@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр · Информатика и ИИ · 7 класс · 1 четверть</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:'Segoe UI',Tahoma,Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#e8f7f0 55%,#eef4ff 100%);
+    color:#132038;
+    padding:18px;
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;
+    -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .app{width:100%;max-width:1000px}
+  .screen{display:none;animation:fade .25s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:#fff;border-radius:20px;
+    box-shadow:0 10px 30px rgba(30,58,138,.10);
+    padding:26px 30px;border:1px solid #e6edf9;
+  }
+  .center-card{max-width:660px;margin:20px auto;text-align:center}
+  .start-card{max-width:780px;margin:6px auto;text-align:center}
+
+  .logo{width:72px;height:72px;margin:0 auto 14px;border-radius:20px;
+    background:linear-gradient(135deg,#2563eb,#16a34a);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(37,99,235,.28)}
+  .logo svg{width:40px;height:40px;fill:#fff}
+
+  h1{font-size:26px;margin-bottom:6px;line-height:1.2}
+  .sub{color:#64748b;font-size:15px;margin-bottom:16px}
+  .topics{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:9px;
+    text-align:left;margin:0 auto 20px;max-width:660px}
+  .topics li{background:#f1f6ff;border-radius:11px;padding:10px 13px;
+    font-size:13.5px;color:#1e3a8a;font-weight:600;border:1px solid #dbeafe}
+
+  .name-label{display:block;font-weight:800;margin-bottom:9px;font-size:15px;color:#0f172a}
+  .name-input{
+    width:100%;max-width:440px;padding:15px 16px;font-size:17px;
+    border:3px solid #16a34a;border-radius:14px;background:#f0fdf4;
+    outline:none;font-family:inherit;color:#132038;transition:.2s;text-align:center;font-weight:600;
+  }
+  .name-input:focus{box-shadow:0 0 0 5px rgba(22,163,74,.18);background:#fff}
+  .name-error{display:none;color:#b91c1c;font-size:13.5px;font-weight:700;margin-top:9px}
+
+  .btn{
+    border:none;border-radius:13px;padding:14px 28px;font-size:16px;font-weight:800;
+    cursor:pointer;transition:.18s;font-family:inherit;
+  }
+  .btn-primary{background:#2563eb;color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.30)}
+  .btn-primary:hover:not(:disabled){background:#1d4ed8;transform:translateY(-1px)}
+  .btn-next{background:#16a34a;color:#fff;box-shadow:0 6px 16px rgba(22,163,74,.30)}
+  .btn-next:hover:not(:disabled){background:#15803d;transform:translateY(-1px)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn.big{padding:16px 34px;font-size:17px;margin-top:18px}
+
+  /* ---------- Quiz ---------- */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;padding:0 4px;flex-wrap:wrap;gap:8px}
+  .tb-left{display:flex;align-items:center;gap:10px}
+  .badge{font-size:13px;font-weight:800;padding:6px 13px;border-radius:999px}
+  .badge.b1{background:#dbeafe;color:#1d4ed8}
+  .badge.b2{background:#dcfce7;color:#15803d}
+  .student{font-size:14px;color:#475569;font-weight:700}
+  .counter{font-size:14px;font-weight:800;color:#334155}
+  .progress{height:9px;background:#dbe7fb;border-radius:99px;overflow:hidden;margin-bottom:14px}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#16a34a);
+    border-radius:99px;transition:width .3s ease}
+
+  .q-card{padding:22px 26px 20px}
+  .q-num{font-size:12.5px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
+    color:#2563eb;margin-bottom:7px}
+  .q-text{font-size:19px;line-height:1.35;margin-bottom:16px;font-weight:800}
+
+  .opt{
+    display:flex;gap:12px;align-items:center;width:100%;text-align:left;
+    background:#f8fafc;border:2px solid #e2e8f0;border-radius:13px;
+    padding:13px 16px;font-size:15.5px;cursor:pointer;margin-bottom:10px;
+    font-family:inherit;color:#132038;transition:.15s;font-weight:600;line-height:1.3;
+  }
+  .opt:hover{border-color:#bfdbfe;background:#eff6ff}
+  .opt.sel{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 3px rgba(37,99,235,.13)}
+  .opt.correct{border-color:#16a34a;background:#dcfce7}
+  .opt.wrong{border-color:#dc2626;background:#fee2e2}
+  .opt .letter{width:29px;height:29px;flex:0 0 29px;border-radius:9px;background:#e2e8f0;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#475569}
+  .opt.sel .letter{background:#2563eb;color:#fff}
+  .opt.correct .letter{background:#16a34a;color:#fff}
+  .opt.wrong .letter{background:#dc2626;color:#fff}
+
+  .tf-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .tf-wrap .opt{justify-content:center;font-size:17px;padding:20px 16px;margin-bottom:0}
+
+  .mrow{display:flex;align-items:center;gap:12px;margin-bottom:10px;background:#f8fafc;
+    border:2px solid #e2e8f0;border-radius:13px;padding:9px 14px}
+  .ml{flex:1 1 45%;font-weight:800;font-size:15px;line-height:1.3}
+  .msel{flex:1 1 55%;padding:10px 12px;border-radius:10px;border:2px solid #cbd5e1;
+    font-size:14.5px;font-family:inherit;background:#fff;cursor:pointer;color:#132038;font-weight:600}
+  .msel:focus{outline:none;border-color:#2563eb}
+  .msel.ok{border-color:#16a34a;background:#dcfce7}
+  .msel.bad{border-color:#dc2626;background:#fee2e2}
+
+  .hint{font-size:13px;color:#64748b;font-weight:700;margin-bottom:9px}
+  .pool{display:flex;flex-wrap:wrap;gap:9px;min-height:58px;padding:11px;
+    border:2px dashed #cbd5e1;border-radius:13px;background:#f8fafc;margin-bottom:14px;transition:.15s}
+  .pool.over{border-color:#2563eb;background:#eff6ff}
+  .chip{background:#fff;border:2px solid #cbd5e1;border-radius:11px;padding:9px 14px;
+    font-size:14.5px;font-weight:700;cursor:grab;transition:.15s}
+  .chip:hover{border-color:#93c5fd}
+  .chip.picked{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+  .chip.ok{border-color:#16a34a;background:#dcfce7}
+  .chip.bad{border-color:#dc2626;background:#fee2e2}
+  .chip.dragging{opacity:.45}
+  .cats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cat{border:2px solid #e2e8f0;border-radius:14px;padding:10px;background:#fff}
+  .cat h4{font-size:14.5px;margin-bottom:8px;color:#1d4ed8;font-weight:900;text-align:center}
+  .drop{display:flex;flex-wrap:wrap;gap:8px;min-height:74px;border-radius:11px;padding:7px;
+    background:#f8fafc;border:1px dashed #cbd5e1;transition:.15s;align-content:flex-start}
+  .drop.over{background:#eff6ff;border-color:#2563eb}
+
+  .input-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .numinput{flex:1 1 220px;max-width:320px;padding:14px 18px;font-size:20px;font-weight:800;
+    border:3px solid #93c5fd;border-radius:14px;outline:none;font-family:inherit;
+    background:#f8fbff;color:#132038;text-align:center;transition:.15s}
+  .numinput:focus{border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.13);background:#fff}
+  .numinput.ok{border-color:#16a34a;background:#dcfce7}
+  .numinput.bad{border-color:#dc2626;background:#fee2e2}
+  .unit{font-size:18px;font-weight:900;color:#475569}
+
+  .feedback{display:none;margin-top:14px;padding:12px 16px;border-radius:13px;
+    font-size:14.5px;line-height:1.45}
+  .feedback.good,.feedback.bad{display:block}
+  .feedback.good{background:#f0fdf4;border:1.5px solid #86efac;color:#166534}
+  .feedback.bad{background:#fef2f2;border:1.5px solid #fca5a5;color:#991b1b}
+  .fb-title{font-weight:900;margin-bottom:4px;font-size:15px}
+  .fb-ans{margin-top:2px;font-weight:700}
+  .fb-exp{margin-top:7px;color:#334155;font-size:13.5px;font-weight:600}
+
+  .q-actions{margin-top:16px;display:flex;gap:12px;justify-content:flex-end}
+
+  /* ---------- Result ---------- */
+  .big-icon{font-size:52px;line-height:1;margin-bottom:8px}
+  .result-name{font-size:17px;margin:12px 0 4px;color:#334155}
+  .result-name b{color:#1d4ed8}
+  .score-big{font-size:60px;font-weight:900;color:#2563eb;line-height:1;margin:10px 0 2px}
+  .score-big small{font-size:17px;color:#64748b;font-weight:800}
+  .res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+  .res-grid > div{background:#f1f6ff;border-radius:14px;padding:14px 8px;border:1px solid #dbeafe}
+  .res-grid span{display:block;font-size:21px;font-weight:900;color:#1d4ed8}
+  .res-grid small{display:block;font-size:12px;color:#64748b;font-weight:700;margin-top:4px}
+  .descriptor{background:#f8fafc;border-left:6px solid #2563eb;border-radius:12px;
+    padding:15px 18px;font-size:15px;line-height:1.5;text-align:left;font-weight:600;color:#1e293b}
+  .descriptor.lvl-10{border-left-color:#16a34a;background:#f0fdf4}
+  .descriptor.lvl-8{border-left-color:#2563eb;background:#eff6ff}
+  .descriptor.lvl-6{border-left-color:#f59e0b;background:#fffbeb}
+  .descriptor.lvl-1{border-left-color:#dc2626;background:#fef2f2}
+  .muted{color:#64748b;font-size:14.5px;margin-top:8px}
+
+  .toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,40px);
+    background:#dc2626;color:#fff;padding:13px 26px;border-radius:13px;
+    font-weight:800;font-size:15px;opacity:0;pointer-events:none;
+    transition:.25s;z-index:9999;box-shadow:0 10px 26px rgba(220,38,38,.4);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- Калькулятор ---------- */
+  .calc-toggle{
+    position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;
+    border:none;background:#2563eb;color:#fff;font-size:26px;cursor:pointer;
+    box-shadow:0 8px 22px rgba(37,99,235,.4);z-index:500;display:none;
+    transition:.2s;font-family:inherit;
+  }
+  .calc-toggle:hover{background:#1d4ed8;transform:scale(1.06)}
+  .calc-toggle.show{display:flex;align-items:center;justify-content:center}
+
+  .calc-panel{
+    position:fixed;right:22px;bottom:92px;width:272px;background:#fff;border-radius:16px;
+    box-shadow:0 16px 40px rgba(15,23,42,.22);padding:12px;z-index:501;display:none;
+    border:1px solid #e2e8f0;
+  }
+  .calc-panel.show{display:block}
+  .calc-head{display:flex;justify-content:space-between;align-items:center;
+    font-weight:900;font-size:14px;color:#1e3a8a;margin-bottom:8px;padding:0 2px}
+  .calc-close{border:none;background:#f1f5f9;color:#334155;width:26px;height:26px;
+    border-radius:8px;cursor:pointer;font-size:16px;font-weight:900;line-height:1}
+  .calc-close:hover{background:#e2e8f0}
+  .calc-display{width:100%;padding:12px 14px;font-size:22px;font-weight:800;text-align:right;
+    border:2px solid #cbd5e1;border-radius:11px;background:#f8fafc;color:#0f172a;
+    margin-bottom:10px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis}
+  .calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .calc-keys button{
+    border:none;border-radius:10px;padding:13px 0;font-size:17px;font-weight:800;
+    background:#f1f5f9;color:#132038;cursor:pointer;font-family:inherit;transition:.12s;
+  }
+  .calc-keys button:hover{background:#e2e8f0}
+  .calc-keys button.op{background:#dbeafe;color:#1d4ed8}
+  .calc-keys button.op:hover{background:#bfdbfe}
+  .calc-keys button.eq{background:#16a34a;color:#fff}
+  .calc-keys button.eq:hover{background:#15803d}
+  .calc-keys button.fn{background:#fee2e2;color:#b91c1c}
+  .calc-keys button.fn:hover{background:#fecaca}
+
+  @media (max-width:820px){
+    .topics{grid-template-columns:1fr}
+    .cats{grid-template-columns:1fr}
+    .tf-wrap{grid-template-columns:1fr}
+    .res-grid{grid-template-columns:1fr}
+    .q-text{font-size:17px}
+    .card{padding:20px 18px}
+    .mrow{flex-direction:column;align-items:stretch}
+    .ml{flex:auto}
+    .calc-panel{width:248px;right:14px;bottom:86px}
+    .calc-toggle{right:14px;bottom:14px}
+  }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="app">
+
+  <!-- ================= СТАРТОВЫЙ ЭКРАН ================= -->
+  <section id="screen-start" class="screen active">
+    <div class="card start-card">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+        </svg>
+      </div>
+      <h1>Тренажёр: Информатика и ИИ</h1>
+      <p class="sub">7 класс · 1 четверть · 50 заданий · 2 этапа · 10 баллов</p>
+
+      <ul class="topics">
+        <li>🛡️ Урок 1. Личная безопасность и сервисные программы</li>
+        <li>📦 Урок 2. Единицы измерения информации</li>
+        <li>🔁 Урок 3. Перевод единиц измерения информации</li>
+        <li>🔤 Урок 6. Кодирование текста и монохромного изображения</li>
+      </ul>
+
+      <label class="name-label" for="nameInput">Введите ваше имя и фамилию</label>
+      <input id="nameInput" class="name-input" type="text" placeholder="" autocomplete="off" spellcheck="false">
+      <div id="nameError" class="name-error">Пожалуйста, введите имя (не менее 2 символов), чтобы начать.</div>
+
+      <div>
+        <button id="startBtn" class="btn btn-primary big" disabled>Начать тренажёр</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ЭКРАН ТЕСТА ================= -->
+  <section id="screen-quiz" class="screen">
+    <div class="topbar">
+      <div class="tb-left">
+        <span class="badge b1" id="stageBadge">Этап 1 · Базовый</span>
+        <span class="student" id="studentName"></span>
+      </div>
+      <div class="counter" id="counter">Задание 1 из 50</div>
+    </div>
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="card q-card">
+      <div class="q-num" id="qNum">Задание 1</div>
+      <h2 class="q-text" id="qText"></h2>
+      <div id="qBody" class="q-body"></div>
+      <div id="feedback" class="feedback"></div>
+      <div class="q-actions">
+        <button id="answerBtn" class="btn btn-primary" disabled>Ответить</button>
+        <button id="nextBtn" class="btn btn-next" style="display:none">Далее →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ПЕРЕХОД КО 2 ЭТАПУ ================= -->
+  <section id="screen-transition" class="screen">
+    <div class="card center-card">
+      <div class="big-icon">🚀</div>
+      <h1>Этап 1 завершён!</h1>
+      <p class="muted" style="margin-top:10px">Вы ответили на все 35 заданий базового уровня.</p>
+      <p class="muted">Итоговая оценка будет показана только после завершения всего тренажёра.</p>
+      <button id="toStage2Btn" class="btn btn-primary big">Перейти ко 2 Этапу (Продвинутый)</button>
+    </div>
+  </section>
+
+  <!-- ================= ИТОГОВЫЙ ЭКРАН ================= -->
+  <section id="screen-result" class="screen">
+    <div class="card center-card">
+      <div class="big-icon">🏆</div>
+      <h1>Тренажёр завершён!</h1>
+      <div class="result-name">Ученик: <b id="resName"></b></div>
+
+      <div class="score-big"><span id="resScore">0</span> <small>из 10 баллов</small></div>
+
+      <div class="res-grid">
+        <div><span id="resPercent">0%</span><small>Процент выполнения</small></div>
+        <div><span id="resS1">0 / 35</span><small>Этап 1 (базовый)</small></div>
+        <div><span id="resS2">0 / 15</span><small>Этап 2 (продвинутый)</small></div>
+      </div>
+
+      <div class="descriptor" id="resDescriptor"></div>
+
+      <button id="restartBtn" class="btn btn-primary big">Пройти заново</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= КАЛЬКУЛЯТОР ================= -->
+<button id="calcToggle" class="calc-toggle" type="button" title="Калькулятор" aria-label="Открыть калькулятор">🧮</button>
+<div id="calcPanel" class="calc-panel" role="dialog" aria-label="Калькулятор">
+  <div class="calc-head">
+    <span>Калькулятор</span>
+    <button id="calcClose" class="calc-close" type="button" aria-label="Закрыть">×</button>
+  </div>
+  <input id="calcDisplay" class="calc-display" type="text" readonly value="0" aria-label="Результат">
+  <div class="calc-keys" id="calcKeys">
+    <button type="button" class="fn" data-act="clear">C</button>
+    <button type="button" class="fn" data-act="back">⌫</button>
+    <button type="button" class="op" data-val="(">(</button>
+    <button type="button" class="op" data-val=")">)</button>
+
+    <button type="button" data-val="7">7</button>
+    <button type="button" data-val="8">8</button>
+    <button type="button" data-val="9">9</button>
+    <button type="button" class="op" data-val="/">÷</button>
+
+    <button type="button" data-val="4">4</button>
+    <button type="button" data-val="5">5</button>
+    <button type="button" data-val="6">6</button>
+    <button type="button" class="op" data-val="*">×</button>
+
+    <button type="button" data-val="1">1</button>
+    <button type="button" data-val="2">2</button>
+    <button type="button" data-val="3">3</button>
+    <button type="button" class="op" data-val="-">−</button>
+
+    <button type="button" data-val="0">0</button>
+    <button type="button" data-val=".">.</button>
+    <button type="button" class="eq" data-act="equals">=</button>
+    <button type="button" class="op" data-val="+">+</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============================================================
+   ЗАЩИТА ОТ КОПИРОВАНИЯ
+   ============================================================ */
+function warn(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+document.addEventListener('copy', e => { e.preventDefault(); warn('Копирование запрещено!'); });
+document.addEventListener('cut',  e => { e.preventDefault(); warn('Копирование запрещено!'); });
+document.addEventListener('selectstart', e => {
+  if(!e.target.closest('input, textarea')) e.preventDefault();
+});
+document.addEventListener('dragstart', e => {
+  if(!e.target.classList || !e.target.classList.contains('chip')) e.preventDefault();
+});
+
+document.addEventListener('keydown', function(e){
+  const k = (e.key || '').toLowerCase();
+
+  if(e.key === 'F12' || e.keyCode === 123){
+    e.preventDefault(); warn('Копирование запрещено!'); return false;
+  }
+  if(e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44){
+    e.preventDefault();
+    try{ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(''); }catch(_){}
+    warn('Скриншоты запрещены!'); return false;
+  }
+  if((e.ctrlKey || e.metaKey) && !e.shiftKey && ['c','u','s','p','a','x'].includes(k)){
+    e.preventDefault(); warn('Копирование запрещено!'); return false;
+  }
+  if((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c','s'].includes(k)){
+    e.preventDefault(); warn('Копирование запрещено!'); return false;
+  }
+}, true);
+
+document.addEventListener('keyup', function(e){
+  if(e.key === 'PrintScreen' || e.code === 'PrintScreen'){
+    try{ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(''); }catch(_){}
+    warn('Скриншоты запрещены!');
+  }
+}, true);
+
+/* ============================================================
+   БАЗА ЗАДАНИЙ
+   ============================================================ */
+const STAGE1 = [
+  /* ---------- 1–5: безопасность и сервисные программы ---------- */
+  { type:'choice',
+    q:'Какие программы называют сервисными?',
+    options:[
+      {t:'Программы, которые обслуживают компьютер и расширяют возможности операционной системы', ok:true},
+      {t:'Только программы для набора и печати текста', ok:false},
+      {t:'Программы, которые создают компьютерные вирусы', ok:false},
+      {t:'Программы, встроенные в процессор компьютера', ok:false}
+    ],
+    explain:'Сервисные программы (утилиты) — антивирусы, архиваторы, брандмауэры, программы очистки и дефрагментации диска — помогают обслуживать компьютер.'
+  },
+  { type:'tf',
+    q:'Антивирусная программа относится к сервисным программам.',
+    answer:true,
+    explain:'Антивирус — типичная сервисная программа: она защищает компьютер от вредоносного программного обеспечения.'
+  },
+  { type:'choice',
+    q:'Какая из перечисленных программ является вредоносной?',
+    options:[
+      {t:'Программа-вымогатель', ok:true},
+      {t:'Архиватор', ok:false},
+      {t:'Антивирус', ok:false},
+      {t:'Дефрагментатор диска', ok:false}
+    ],
+    explain:'Вредоносные программы: вирусы, черви, трояны, шпионы, вымогатели. Архиватор, антивирус и дефрагментатор — полезные сервисные программы.'
+  },
+  { type:'match',
+    q:'Сопоставь программу и её назначение.',
+    pairs:[
+      {l:'Антивирус', r:'Обнаружение и удаление вредоносных программ'},
+      {l:'Архиватор', r:'Сжатие файлов для экономии места'},
+      {l:'Брандмауэр (защищает от сетевых атак)', r:'Защита от несанкционированного доступа по сети'},
+      {l:'Дефрагментатор (наводит порядок в файлах на диске)', r:'Упорядочивание файлов на диске'}
+    ],
+    explain:'Каждая сервисная программа выполняет свою задачу по обслуживанию и защите компьютера.'
+  },
+  { type:'tf',
+    q:'Надёжный пароль должен состоять только из букв своего имени.',
+    answer:false,
+    explain:'Надёжный пароль содержит буквы разного регистра, цифры и символы и не связан с личными данными.'
+  },
+
+  /* ---------- 6–7 ---------- */
+  { type:'choice',
+    q:'Что нужно сделать при получении письма с подозрительным вложением от незнакомца?',
+    options:[
+      {t:'Не открывать вложение и удалить письмо', ok:true},
+      {t:'Открыть вложение и посмотреть, что внутри', ok:false},
+      {t:'Переслать письмо всем друзьям', ok:false},
+      {t:'Ответить отправителю и сообщить свой пароль', ok:false}
+    ],
+    explain:'Вложения от неизвестных отправителей часто содержат вирусы. Безопаснее всего не открывать файл и удалить письмо.'
+  },
+  { type:'classify',
+    q:'Распредели объекты по группам: «Средства защиты» и «Угрозы».',
+    cats:['Средства защиты','Угрозы'],
+    items:[
+      {t:'Антивирус', c:0},
+      {t:'Троянская программа', c:1},
+      {t:'Брандмауэр', c:0},
+      {t:'Компьютерный червь', c:1},
+      {t:'Обновление антивирусных баз', c:0},
+      {t:'Программа-шпион', c:1}
+    ],
+    explain:'Антивирус, брандмауэр и обновление баз — защита. Троян, червь и шпион — вредоносные программы.'
+  },
+
+  /* ---------- 8–14: единицы информации ---------- */
+  { type:'choice',
+    q:'Наименьшая единица измерения информации — это:',
+    options:[
+      {t:'бит', ok:true},
+      {t:'байт', ok:false},
+      {t:'Кбайт', ok:false},
+      {t:'пиксель', ok:false}
+    ],
+    explain:'Бит — минимальная единица информации. Он принимает только два значения: 0 или 1.'
+  },
+  { type:'choice',
+    q:'Сколько бит содержится в одном байте?',
+    options:[
+      {t:'8 бит', ok:true},
+      {t:'4 бита', ok:false},
+      {t:'16 бит', ok:false},
+      {t:'1024 бита', ok:false}
+    ],
+    explain:'1 байт = 8 бит. Это основное соотношение единиц измерения информации.'
+  },
+  { type:'tf',
+    q:'1 Кбайт = 1000 байт.',
+    answer:false,
+    explain:'В информатике 1 Кбайт = 1024 байта (2 в 10-й степени), а не 1000.'
+  },
+  { type:'match',
+    q:'Сопоставь единицу измерения информации и её сокращение.',
+    pairs:[
+      {l:'Килобайт', r:'Кб'},
+      {l:'Мегабайт', r:'Мб'},
+      {l:'Гигабайт', r:'Гб'},
+      {l:'Байт', r:'Б'}
+    ],
+    explain:'Кб — килобайт, Мб — мегабайт, Гб — гигабайт, Б — байт.'
+  },
+  { type:'choice',
+    q:'Какая единица измерения информации больше остальных?',
+    options:[
+      {t:'Мегабайт', ok:true},
+      {t:'Килобайт', ok:false},
+      {t:'Байт', ok:false},
+      {t:'Бит', ok:false}
+    ],
+    explain:'Ряд возрастания: бит → байт → Кбайт → Мбайт → Гбайт.'
+  },
+  { type:'choice',
+    q:'Сколько байт в одном килобайте?',
+    options:[
+      {t:'1024', ok:true},
+      {t:'1000', ok:false},
+      {t:'8', ok:false},
+      {t:'512', ok:false}
+    ],
+    explain:'1 Кбайт = 1024 байта.'
+  },
+  { type:'tf',
+    q:'Бит может принимать только два значения: 0 или 1.',
+    answer:true,
+    explain:'Бит — двоичная единица: одно из двух состояний (0 или 1, «нет» или «да»).'
+  },
+
+  /* ---------- 15–22 ---------- */
+  { type:'choice',
+    q:'Для чего используется программа-архиватор?',
+    options:[
+      {t:'Для сжатия файлов и уменьшения их размера', ok:true},
+      {t:'Для проверки компьютера на вирусы', ok:false},
+      {t:'Для просмотра веб-страниц', ok:false},
+      {t:'Для прослушивания музыки', ok:false}
+    ],
+    explain:'Архиватор сжимает файлы, чтобы они занимали меньше места и быстрее передавались по сети.'
+  },
+  { type:'choice',
+    q:'Что такое кодирование информации?',
+    options:[
+      {t:'Преобразование информации в форму, удобную для хранения и передачи', ok:true},
+      {t:'Удаление ненужных файлов с компьютера', ok:false},
+      {t:'Печать документа на принтере', ok:false},
+      {t:'Ускорение работы процессора', ok:false}
+    ],
+    explain:'Кодирование — это перевод информации в условные знаки (коды), чаще всего в двоичный код.'
+  },
+  { type:'tf',
+    q:'В компьютере любая информация — текст, изображение, звук — хранится в двоичном виде.',
+    answer:true,
+    explain:'Компьютер работает с электрическими сигналами двух уровней, поэтому вся информация кодируется нулями и единицами.'
+  },
+  { type:'choice',
+    q:'С помощью какого алфавита кодируется информация в компьютере?',
+    options:[
+      {t:'Двоичного: 0 и 1', ok:true},
+      {t:'Русского алфавита', ok:false},
+      {t:'Латинского алфавита', ok:false},
+      {t:'Арабских цифр от 0 до 9', ok:false}
+    ],
+    explain:'В компьютере используется двоичный код — последовательность нулей и единиц.'
+  },
+  { type:'choice',
+    q:'В кодировке, где один символ занимает 1 байт, сколько бит приходится на один символ?',
+    options:[
+      {t:'8 бит', ok:true},
+      {t:'1 бит', ok:false},
+      {t:'16 бит', ok:false},
+      {t:'2 бита', ok:false}
+    ],
+    explain:'1 байт = 8 бит, значит один символ такой кодировки занимает 8 бит.'
+  },
+  { type:'tf',
+    q:'Монохромное изображение состоит только из двух цветов.',
+    answer:true,
+    explain:'«Монохромный» значит одноцветный: обычно это чёрный и белый цвет, то есть два состояния.'
+  },
+  { type:'choice',
+    q:'Что такое пиксель?',
+    options:[
+      {t:'Минимальная точка (элемент) изображения', ok:true},
+      {t:'Единица измерения объёма информации', ok:false},
+      {t:'Программа для обработки фото', ok:false},
+      {t:'Устройство вывода изображения', ok:false}
+    ],
+    explain:'Изображение на экране состоит из маленьких точек — пикселей.'
+  },
+  { type:'choice',
+    q:'Сколько бит нужно для кодирования одного пикселя монохромного изображения?',
+    options:[
+      {t:'1 бит', ok:true},
+      {t:'2 бита', ok:false},
+      {t:'8 бит', ok:false},
+      {t:'24 бита', ok:false}
+    ],
+    explain:'У монохромного изображения 2 цвета (2 = 2¹), поэтому на один пиксель достаточно 1 бита.'
+  },
+
+  /* ---------- 23–30 ---------- */
+  { type:'match',
+    q:'Сопоставь величины, которые равны друг другу.',
+    pairs:[
+      {l:'1 байт', r:'8 бит'},
+      {l:'1 Кбайт', r:'1024 байта'},
+      {l:'1 Мбайт', r:'1024 Кбайта'},
+      {l:'1 Гбайт', r:'1024 Мбайта'}
+    ],
+    explain:'Каждый следующий уровень больше предыдущего в 1024 раза.'
+  },
+  { type:'tf',
+    q:'Чем больше разрешение изображения, тем больше информации нужно для его хранения.',
+    answer:true,
+    explain:'Больше пикселей — больше данных. Объём изображения: I = K × i, где K — число пикселей, i — глубина цвета.'
+  },
+  { type:'choice',
+    q:'Что из перечисленного НЕ является сервисной программой?',
+    options:[
+      {t:'Компьютерный вирус', ok:true},
+      {t:'Антивирус', ok:false},
+      {t:'Архиватор', ok:false},
+      {t:'Программа очистки диска', ok:false}
+    ],
+    explain:'Вирус — вредоносная программа, а не помощник для компьютера.'
+  },
+  { type:'choice',
+    q:'Для чего нужен брандмауэр (файрвол)?',
+    options:[
+      {t:'Для контроля сетевого трафика и защиты от несанкционированного доступа', ok:true},
+      {t:'Для сжатия фотографий', ok:false},
+      {t:'Для набора текста', ok:false},
+      {t:'Для увеличения объёма жёсткого диска', ok:false}
+    ],
+    explain:'Брандмауэр проверяет сетевые соединения и блокирует подозрительные.'
+  },
+  { type:'tf',
+    q:'В интернете можно сообщать свой домашний адрес и номер телефона незнакомым людям.',
+    answer:false,
+    explain:'Личные данные нельзя сообщать незнакомым людям — это правило личной безопасности в сети.'
+  },
+  { type:'classify',
+    q:'Распредели слова по группам: «Единицы измерения информации» и «Не единицы информации».',
+    cats:['Единицы информации','Не единицы информации'],
+    items:[
+      {t:'бит', c:0},
+      {t:'байт', c:0},
+      {t:'пиксель', c:1},
+      {t:'Кбайт', c:0},
+      {t:'герц', c:1},
+      {t:'Мбайт', c:0}
+    ],
+    explain:'Пиксель — элемент изображения, герц — единица частоты. Бит, байт, Кбайт, Мбайт измеряют информацию.'
+  },
+  { type:'choice',
+    q:'Сколько килобайт в одном мегабайте?',
+    options:[
+      {t:'1024', ok:true},
+      {t:'100', ok:false},
+      {t:'8', ok:false},
+      {t:'1024 000', ok:false}
+    ],
+    explain:'1 Мбайт = 1024 Кбайта.'
+  },
+  { type:'tf',
+    q:'Информация измеряется в битах, байтах, килобайтах и других подобных единицах.',
+    answer:true,
+    explain:'Это верно: перечисленные единицы служат для измерения информационного объёма.'
+  },
+
+  /* ---------- 31–35 ---------- */
+  { type:'choice',
+    q:'Какое действие безопасно в социальных сетях?',
+    options:[
+      {t:'Не публиковать личные данные: адрес, телефон, номер школы', ok:true},
+      {t:'Публиковать фотографию паспорта', ok:false},
+      {t:'Сообщать пароль друзьям', ok:false},
+      {t:'Открывать все ссылки из сообщений', ok:false}
+    ],
+    explain:'Личные данные нужно держать в тайне, а пароль не сообщать никому.'
+  },
+  { type:'match',
+    q:'Сопоставь вид информации и то, что кодируется в компьютере.',
+    pairs:[
+      {l:'Текст', r:'Код символа'},
+      {l:'Изображение', r:'Код цвета пикселя'},
+      {l:'Звук', r:'Последовательность числовых отсчётов'},
+      {l:'Видео', r:'Последовательность кадров'}
+    ],
+    explain:'Любой вид информации переводится в числа, а затем — в двоичный код.'
+  },
+  { type:'tf',
+    q:'Пиксель — это единица измерения объёма информации.',
+    answer:false,
+    explain:'Пиксель — элемент изображения, а не единица измерения информации.'
+  },
+  { type:'choice',
+    q:'Сколько различных символов можно закодировать с помощью 1 байта?',
+    options:[
+      {t:'256', ok:true},
+      {t:'128', ok:false},
+      {t:'8', ok:false},
+      {t:'1024', ok:false}
+    ],
+    explain:'1 байт = 8 бит, значит 2⁸ = 256 различных кодов.'
+  },
+  { type:'choice',
+    q:'Что нужно регулярно делать для защиты компьютера?',
+    options:[
+      {t:'Обновлять антивирусные базы и операционную систему', ok:true},
+      {t:'Отключать антивирус для скорости', ok:false},
+      {t:'Скачивать программы с любых сайтов', ok:false},
+      {t:'Использовать один простой пароль везде', ok:false}
+    ],
+    explain:'Обновления закрывают уязвимости, а свежие антивирусные базы распознают новые угрозы.'
+  }
+];
+
+const STAGE2 = [
+  /* ---------- 36–44: расчёты ---------- */
+  { type:'input',
+    q:'Сколько бит содержится в 3 байтах?',
+    answers:['24'],
+    explain:'3 × 8 = 24 бита.'
+  },
+  { type:'input',
+    q:'Переведи 2048 байт в килобайты. В ответе укажи только число.',
+    answers:['2'],
+    unit:'Кб',
+    explain:'2048 : 1024 = 2 Кбайта.'
+  },
+  { type:'input',
+    q:'Сколько байт содержится в 5 килобайтах?',
+    answers:['5120'],
+    unit:'байт',
+    explain:'5 × 1024 = 5120 байт.'
+  },
+  { type:'input',
+    q:'Сколько килобайт содержится в 2 мегабайтах?',
+    answers:['2048'],
+    unit:'Кб',
+    explain:'2 × 1024 = 2048 Кбайт.'
+  },
+  { type:'input',
+    q:'Текст состоит из 120 символов. Каждый символ занимает 1 байт. Определи объём текста в битах.',
+    answers:['960'],
+    unit:'бит',
+    explain:'120 байт × 8 = 960 бит.'
+  },
+  { type:'input',
+    q:'Монохромное изображение имеет размер 10 × 10 пикселей. Сколько бит нужно для его хранения?',
+    answers:['100'],
+    unit:'бит',
+    explain:'K = 10 × 10 = 100 пикселей; i = 1 бит; I = 100 × 1 = 100 бит.'
+  },
+  { type:'input',
+    q:'Монохромное изображение имеет размер 32 × 32 пикселя. Определи его объём в байтах.',
+    answers:['128'],
+    unit:'байт',
+    explain:'K = 32 × 32 = 1024 пикселя; I = 1024 × 1 = 1024 бита = 1024 : 8 = 128 байт.'
+  },
+  { type:'input',
+    q:'Переведи 1,5 Кбайта в байты.',
+    answers:['1536'],
+    unit:'байт',
+    explain:'1,5 × 1024 = 1536 байт.'
+  },
+  { type:'input',
+    q:'Файл имеет объём 4096 бит. Сколько это байт?',
+    answers:['512'],
+    unit:'байт',
+    explain:'4096 : 8 = 512 байт.'
+  },
+
+  /* ---------- 45–46 ---------- */
+  { type:'classify',
+    q:'Распредели понятия по группам: «Кодирование текста» и «Кодирование изображения».',
+    cats:['Кодирование текста','Кодирование изображения'],
+    items:[
+      {t:'Код символа', c:0},
+      {t:'Пиксель', c:1},
+      {t:'Таблица кодировки', c:0},
+      {t:'Разрешение изображения', c:1},
+      {t:'1 символ = 1 байт', c:0},
+      {t:'Монохромное изображение', c:1}
+    ],
+    explain:'Текст кодируется кодами символов, изображение — кодами пикселей (цветов).'
+  },
+  { type:'match',
+    q:'Сопоставь величину и её эквивалент.',
+    pairs:[
+      {l:'2 байта', r:'16 бит'},
+      {l:'1 Мбайт', r:'1024 Кбайта'},
+      {l:'0,5 Кбайта', r:'512 байт'},
+      {l:'1024 бита', r:'128 байт'}
+    ],
+    explain:'2 × 8 = 16 бит; 1 Мб = 1024 Кб; 0,5 × 1024 = 512 байт; 1024 : 8 = 128 байт.'
+  },
+
+  /* ---------- 47–50 ---------- */
+  { type:'input',
+    q:'Сколько килобайт содержится в 0,5 мегабайта?',
+    answers:['512'],
+    unit:'Кб',
+    explain:'0,5 × 1024 = 512 Кбайт.'
+  },
+  { type:'input',
+    q:'Текст занимает 2 килобайта. Сколько это бит?',
+    answers:['16384'],
+    unit:'бит',
+    explain:'2 × 1024 = 2048 байт; 2048 × 8 = 16384 бита.'
+  },
+  { type:'choice',
+    q:'Ученик получил письмо от неизвестного отправителя с вложением «photo.exe». Какие действия правильные?',
+    options:[
+      {t:'Не открывать вложение, проверить его антивирусом и сообщить взрослому или учителю', ok:true},
+      {t:'Сразу открыть файл, чтобы посмотреть фотографию', ok:false},
+      {t:'Отключить антивирус и открыть вложение', ok:false},
+      {t:'Переслать файл одноклассникам, чтобы они тоже проверили', ok:false}
+    ],
+    explain:'Расширение .exe означает программу, а не фотографию. Такое вложение опасно: его нельзя открывать и пересылать.'
+  },
+  { type:'input',
+    q:'Монохромное изображение имеет размер 128 × 128 пикселей. Сколько килобайт оно занимает?',
+    answers:['2'],
+    unit:'Кб',
+    explain:'K = 128 × 128 = 16384 пикселя; i = 1 бит; I = 16384 × 1 = 16384 бита = 2048 байт = 2048 : 1024 = 2 Кбайта.'
+  }
+];
+
+/* ============================================================
+   СОСТОЯНИЕ И УТИЛИТЫ
+   ============================================================ */
+const state = {
+  name:'',
+  stage:1,
+  index:0,
+  correct1:0,
+  correct2:0,
+  answered:false,
+  current:null,
+  selection:null,
+  _opts:null
+};
+
+let pickedChip = null;
+let dragChip = null;
+
+const $ = sel => document.querySelector(sel);
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + name);
+  if(el) el.classList.add('active');
+  if(name !== 'quiz') calcToggleShow(false);
+  window.scrollTo(0, 0);
+}
+
+function normalizeNumber(v){
+  return String(v).trim().toLowerCase().replace(/\s+/g, '').replace(/,/g, '.');
+}
+
+function isCorrectInput(val, q){
+  const v = normalizeNumber(val);
+  if(v === '') return false;
+  return q.answers.some(ans => {
+    const a = normalizeNumber(ans);
+    const nv = parseFloat(v);
+    const na = parseFloat(a);
+    if(!isNaN(nv) && !isNaN(na)) return Math.abs(nv - na) < 1e-9;
+    return v === a;
+  });
+}
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+const nameInput = $('#nameInput');
+const startBtn = $('#startBtn');
+
+nameInput.addEventListener('input', () => {
+  const ok = nameInput.value.trim().length >= 2;
+  startBtn.disabled = !ok;
+  if(ok) $('#nameError').style.display = 'none';
+});
+
+nameInput.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !startBtn.disabled) startBtn.click();
+});
+
+startBtn.addEventListener('click', () => {
+  const v = nameInput.value.trim();
+  if(v.length < 2){
+    $('#nameError').style.display = 'block';
+    nameInput.focus();
+    return;
+  }
+  state.name = v;
+  state.stage = 1;
+  state.index = 0;
+  state.correct1 = 0;
+  state.correct2 = 0;
+  $('#studentName').textContent = v;
+  showScreen('quiz');
+  renderQuestion();
+});
+
+/* ============================================================
+   РЕНДЕР ВОПРОСА
+   ============================================================ */
+function renderQuestion(){
+  const list = state.stage === 1 ? STAGE1 : STAGE2;
+  const q = list[state.index];
+
+  state.current = q;
+  state.answered = false;
+  state.selection = null;
+  state._opts = null;
+  pickedChip = null;
+  dragChip = null;
+
+  const localNum = state.index + 1;
+  const globalNum = state.stage === 1 ? localNum : STAGE1.length + localNum;
+
+  $('#qNum').textContent = 'Задание ' + globalNum;
+  $('#counter').textContent = 'Задание ' + globalNum + ' из 50';
+
+  const badge = $('#stageBadge');
+  badge.textContent = state.stage === 1 ? 'Этап 1 · Базовый' : 'Этап 2 · Продвинутый';
+  badge.className = 'badge ' + (state.stage === 1 ? 'b1' : 'b2');
+
+  const pct = Math.round(state.index / list.length * 100);
+  $('#progressFill').style.width = pct + '%';
+
+  $('#qText').textContent = q.q;
+
+  const body = $('#qBody');
+  body.innerHTML = '';
+
+  const fb = $('#feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+
+  $('#answerBtn').style.display = '';
+  $('#answerBtn').disabled = true;
+  $('#nextBtn').style.display = 'none';
+
+  if(state.stage === 1 && state.index === STAGE1.length - 1){
+    $('#nextBtn').textContent = 'Завершить этап 1 →';
+  } else if(state.stage === 2 && state.index === STAGE2.length - 1){
+    $('#nextBtn').textContent = 'Показать результат →';
+  } else {
+    $('#nextBtn').textContent = 'Далее →';
+  }
+
+  if(q.type === 'choice')      renderChoice(q, body);
+  else if(q.type === 'tf')     renderTF(q, body);
+  else if(q.type === 'match')  renderMatch(q, body);
+  else if(q.type === 'classify') renderClassify(q, body);
+  else if(q.type === 'input')  renderInput(q, body);
+
+  /* Калькулятор доступен только на 2 этапе */
+  calcToggleShow(state.stage === 2);
+
+  checkReady();
+}
+
+/* ---------- одиночный выбор ---------- */
+function renderChoice(q, body){
+  const opts = shuffle(q.options);
+  state._opts = opts;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'options';
+
+  opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'opt';
+    b.dataset.idx = i;
+
+    const letter = document.createElement('span');
+    letter.className = 'letter';
+    letter.textContent = 'ABCD'[i] || '•';
+
+    const txt = document.createElement('span');
+    txt.className = 'opt-txt';
+    txt.textContent = o.t;
+
+    b.appendChild(letter);
+    b.appendChild(txt);
+
+    b.addEventListener('click', () => {
+      if(state.answered) return;
+      wrap.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      state.selection = o;
+      checkReady();
+    });
+
+    wrap.appendChild(b);
+  });
+
+  body.appendChild(wrap);
+}
+
+/* ---------- верно / неверно ---------- */
+function renderTF(q, body){
+  const wrap = document.createElement('div');
+  wrap.className = 'tf-wrap';
+
+  [['true', '✔ Верно'], ['false', '✘ Неверно']].forEach(([val, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'opt tf';
+    b.dataset.v = val;
+    b.textContent = label;
+
+    b.addEventListener('click', () => {
+      if(state.answered) return;
+      wrap.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      state.selection = (val === 'true');
+      checkReady();
+    });
+
+    wrap.appendChild(b);
+  });
+
+  body.appendChild(wrap);
+}
+
+/* ---------- сопоставление ---------- */
+function renderMatch(q, body){
+  const rights = shuffle(q.pairs.map(p => p.r));
+  const wrap = document.createElement('div');
+
+  q.pairs.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'mrow';
+
+    const left = document.createElement('span');
+    left.className = 'ml';
+    left.textContent = p.l;
+
+    const sel = document.createElement('select');
+    sel.className = 'msel';
+    sel.dataset.i = i;
+
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = '— выберите —';
+    sel.appendChild(ph);
+
+    rights.forEach(r => {
+      const o = document.createElement('option');
+      o.value = r;
+      o.textContent = r;
+      sel.appendChild(o);
+    });
+
+    sel.addEventListener('change', checkReady);
+
+    row.appendChild(left);
+    row.appendChild(sel);
+    wrap.appendChild(row);
+  });
+
+  body.appendChild(wrap);
+}
+
+/* ---------- классификация / drag & drop ---------- */
+function makeChip(item){
+  const c = document.createElement('div');
+  c.className = 'chip';
+  c.draggable = true;
+  c.textContent = item.t;
+  c.dataset.cat = String(item.c);
+
+  c.addEventListener('dragstart', e => {
+    if(state.answered){ e.preventDefault(); return; }
+    dragChip = c;
+    c.classList.add('dragging');
+    try{ e.dataTransfer.setData('text/plain', 'chip'); }catch(_){}
+    try{ e.dataTransfer.effectAllowed = 'move'; }catch(_){}
+  });
+
+  c.addEventListener('dragend', () => {
+    c.classList.remove('dragging');
+    dragChip = null;
+  });
+
+  c.addEventListener('click', e => {
+    e.stopPropagation();
+    if(state.answered) return;
+    if(pickedChip === c){
+      c.classList.remove('picked');
+      pickedChip = null;
+      return;
+    }
+    if(pickedChip) pickedChip.classList.remove('picked');
+    pickedChip = c;
+    c.classList.add('picked');
+  });
+
+  return c;
+}
+
+function attachZone(zone){
+  zone.addEventListener('click', () => {
+    if(state.answered || !pickedChip) return;
+    zone.appendChild(pickedChip);
+    pickedChip.classList.remove('picked');
+    pickedChip = null;
+    checkReady();
+  });
+
+  zone.addEventListener('dragover', e => {
+    if(state.answered) return;
+    e.preventDefault();
+    try{ e.dataTransfer.dropEffect = 'move'; }catch(_){}
+    zone.classList.add('over');
+  });
+
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('over');
+    if(state.answered) return;
+    if(dragChip){
+      zone.appendChild(dragChip);
+      dragChip = null;
+      checkReady();
+    }
+  });
+}
+
+function renderClassify(q, body){
+  const hint = document.createElement('div');
+  hint.className = 'hint';
+  hint.textContent = 'Перетащите карточки в нужную группу или нажмите на карточку, а затем на группу.';
+  body.appendChild(hint);
+
+  const pool = document.createElement('div');
+  pool.className = 'pool';
+  pool.id = 'poolZone';
+  pool.dataset.zone = 'pool';
+  attachZone(pool);
+  body.appendChild(pool);
+
+  shuffle(q.items).forEach(item => pool.appendChild(makeChip(item)));
+
+  const cats = document.createElement('div');
+  cats.className = 'cats';
+
+  q.cats.forEach((catName, ci) => {
+    const cat = document.createElement('div');
+    cat.className = 'cat';
+
+    const h = document.createElement('h4');
+    h.textContent = catName;
+
+    const drop = document.createElement('div');
+    drop.className = 'drop';
+    drop.dataset.zone = String(ci);
+    attachZone(drop);
+
+    cat.appendChild(h);
+    cat.appendChild(drop);
+    cats.appendChild(cat);
+  });
+
+  body.appendChild(cats);
+}
+
+/* ---------- числовой ввод ---------- */
+function renderInput(q, body){
+  const wrap = document.createElement('div');
+  wrap.className = 'input-wrap';
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'numinput';
+  inp.autocomplete = 'off';
+  inp.spellcheck = false;
+  inp.setAttribute('placeholder', '');
+  inp.setAttribute('inputmode', 'decimal');
+
+  inp.addEventListener('input', checkReady);
+  inp.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      if(!$('#answerBtn').disabled) checkAnswer();
+    }
+  });
+
+  wrap.appendChild(inp);
+
+  if(q.unit){
+    const u = document.createElement('span');
+    u.className = 'unit';
+    u.textContent = q.unit;
+    wrap.appendChild(u);
+  }
+
+  body.appendChild(wrap);
+  setTimeout(() => { try{ inp.focus(); }catch(_){} }, 60);
+}
+
+/* ============================================================
+   ГОТОВНОСТЬ ОТВЕТА
+   ============================================================ */
+function checkReady(){
+  const q = state.current;
+  if(!q) return;
+
+  let ok = false;
+
+  if(q.type === 'choice' || q.type === 'tf'){
+    ok = state.selection !== null && state.selection !== undefined;
+  } else if(q.type === 'match'){
+    const sels = [...document.querySelectorAll('.msel')];
+    ok = sels.length > 0 && sels.every(s => s.value !== '');
+  } else if(q.type === 'classify'){
+    const pool = document.getElementById('poolZone');
+    ok = pool ? pool.querySelectorAll('.chip').length === 0 : false;
+  } else if(q.type === 'input'){
+    const inp = document.querySelector('.numinput');
+    ok = inp ? inp.value.trim() !== '' : false;
+  }
+
+  $('#answerBtn').disabled = !ok;
+}
+
+/* ============================================================
+   ПРОВЕРКА ОТВЕТА
+   ============================================================ */
+function correctAnswerText(q){
+  if(q.type === 'choice'){
+    const right = q.options.find(o => o.ok);
+    return right ? right.t : '';
+  }
+  if(q.type === 'tf') return q.answer ? 'Верно' : 'Неверно';
+  if(q.type === 'match'){
+    return q.pairs.map(p => p.l + ' → ' + p.r).join('; ');
+  }
+  if(q.type === 'classify'){
+    return q.items.map(it => it.t + ' → ' + q.cats[it.c]).join('; ');
+  }
+  if(q.type === 'input'){
+    return q.answers[0] + (q.unit ? ' ' + q.unit : '');
+  }
+  return '';
+}
+
+function showFeedback(correct, q){
+  const fb = $('#feedback');
+  fb.className = 'feedback ' + (correct ? 'good' : 'bad');
+
+  let html = '<div class="fb-title">' + (correct ? '✔ Верно!' : '✘ Неверно') + '</div>';
+
+  if(!correct){
+    html += '<div class="fb-ans">Правильный ответ: ' + escapeHtml(correctAnswerText(q)) + '</div>';
+  }
+  if(q.explain){
+    html += '<div class="fb-exp">' + escapeHtml(q.explain) + '</div>';
+  }
+
+  fb.innerHTML = html;
+}
+
+function checkAnswer(){
+  if(state.answered) return;
+  const q = state.current;
+  let correct = false;
+
+  if(q.type === 'choice'){
+    correct = !!(state.selection && state.selection.ok);
+
+    document.querySelectorAll('#qBody .opt').forEach(b => {
+      const o = state._opts[Number(b.dataset.idx)];
+      if(o && o.ok) b.classList.add('correct');
+      if(b.classList.contains('sel') && o && !o.ok) b.classList.add('wrong');
+    });
+
+  } else if(q.type === 'tf'){
+    correct = (state.selection === q.answer);
+
+    document.querySelectorAll('#qBody .tf').forEach(b => {
+      const v = b.dataset.v === 'true';
+      if(v === q.answer) b.classList.add('correct');
+      if(v === state.selection && v !== q.answer) b.classList.add('wrong');
+    });
+
+  } else if(q.type === 'match'){
+    correct = true;
+    document.querySelectorAll('.msel').forEach(s => {
+      const i = Number(s.dataset.i);
+      const ok = s.value === q.pairs[i].r;
+      s.classList.add(ok ? 'ok' : 'bad');
+      s.disabled = true;
+      if(!ok) correct = false;
+    });
+
+  } else if(q.type === 'classify'){
+    correct = true;
+    document.querySelectorAll('#qBody .chip').forEach(c => {
+      const parent = c.parentElement;
+      const zone = parent ? parent.dataset.zone : 'pool';
+      const ok = (zone !== 'pool') && (zone === c.dataset.cat);
+      c.classList.add(ok ? 'ok' : 'bad');
+      c.draggable = false;
+      if(!ok) correct = false;
+    });
+
+  } else if(q.type === 'input'){
+    const inp = document.querySelector('.numinput');
+    correct = isCorrectInput(inp.value, q);
+    inp.classList.add(correct ? 'ok' : 'bad');
+    inp.disabled = true;
+  }
+
+  state.answered = true;
+
+  if(correct){
+    if(state.stage === 1) state.correct1++;
+    else state.correct2++;
+  }
+
+  showFeedback(correct, q);
+
+  $('#answerBtn').style.display = 'none';
+  $('#nextBtn').style.display = 'inline-block';
+}
+
+/* ============================================================
+   ПЕРЕХОДЫ
+   ============================================================ */
+function nextQuestion(){
+  const list = state.stage === 1 ? STAGE1 : STAGE2;
+
+  if(!state.answered) return;
+
+  state.index++;
+
+  if(state.index < list.length){
+    renderQuestion();
+    return;
+  }
+
+  if(state.stage === 1){
+    state.stage = 2;
+    state.index = 0;
+    $('#progressFill').style.width = '100%';
+    showScreen('transition');
+  } else {
+    $('#progressFill').style.width = '100%';
+    showResult();
+  }
+}
+
+$('#answerBtn').addEventListener('click', checkAnswer);
+$('#nextBtn').addEventListener('click', nextQuestion);
+
+$('#toStage2Btn').addEventListener('click', () => {
+  showScreen('quiz');
+  renderQuestion();
+});
+
+/* ============================================================
+   ИТОГИ
+   ============================================================ */
+function getDescriptor(total){
+  if(total >= 9.5){
+    return {
+      cls:'lvl-10',
+      text:'Отлично! Полное усвоение материала, безупречный перевод единиц и кодирование информации.'
+    };
+  }
+  if(total >= 7.5){
+    return {
+      cls:'lvl-8',
+      text:'Хорошо! Высокий уровень знаний, допущены незначительные ошибки в сложных расчётах.'
+    };
+  }
+  if(total >= 5.5){
+    return {
+      cls:'lvl-6',
+      text:'Удовлетворительно! Базовый уровень усвоен, рекомендуется повторить формулы перевода единиц.'
+    };
+  }
+  return {
+    cls:'lvl-1',
+    text:'Требуется повторение! Пройдите темы 1 четверти повторно.'
+  };
+}
+
+function showResult(){
+  const totalQuestions = STAGE1.length + STAGE2.length;
+  const correctTotal = state.correct1 + state.correct2;
+
+  const points1 = (state.correct1 / STAGE1.length) * 8;
+  const points2 = (state.correct2 / STAGE2.length) * 2;
+  const total = Math.round((points1 + points2) * 10) / 10;
+
+  const percent = Math.round(correctTotal / totalQuestions * 100);
+
+  $('#resName').textContent = state.name;
+  $('#resScore').textContent = total.toFixed(1).replace('.0', '');
+  $('#resPercent').textContent = percent + '%';
+  $('#resS1').textContent = state.correct1 + ' / ' + STAGE1.length;
+  $('#resS2').textContent = state.correct2 + ' / ' + STAGE2.length;
+
+  const d = getDescriptor(total);
+  const box = $('#resDescriptor');
+  box.className = 'descriptor ' + d.cls;
+  box.textContent = d.text;
+
+  showScreen('result');
+}
+
+/* ============================================================
+   КАЛЬКУЛЯТОР
+   ============================================================ */
+const calcToggle = document.getElementById('calcToggle');
+const calcPanel = document.getElementById('calcPanel');
+const calcDisplay = document.getElementById('calcDisplay');
+let calcExpr = '';
+
+function calcRender(){
+  calcDisplay.value = calcExpr === '' ? '0'
+    : calcExpr.replace(/\*/g, '×').replace(/\//g, '÷');
+}
+
+function calcToggleShow(show){
+  calcToggle.classList.toggle('show', show);
+  if(!show) calcPanel.classList.remove('show');
+}
+
+function calcEvaluate(expr){
+  if(!expr) return null;
+  const clean = expr.replace(/[^0-9+\-*/.()]/g, '');
+  if(clean === '') return null;
+  try{
+    const fn = new Function('"use strict"; return (' + clean + ');');
+    const val = fn();
+    if(typeof val !== 'number' || !isFinite(val)) return null;
+    return Math.round(val * 1e6) / 1e6;
+  }catch(_){
+    return null;
+  }
+}
+
+calcToggle.addEventListener('click', () => {
+  calcPanel.classList.toggle('show');
+});
+
+document.getElementById('calcClose').addEventListener('click', () => {
+  calcPanel.classList.remove('show');
+});
+
+document.getElementById('calcKeys').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if(!btn) return;
+
+  const act = btn.dataset.act;
+  const val = btn.dataset.val;
+
+  if(act === 'clear'){
+    calcExpr = '';
+  } else if(act === 'back'){
+    calcExpr = calcExpr.slice(0, -1);
+  } else if(act === 'equals'){
+    if(calcExpr === '') return;
+    const result = calcEvaluate(calcExpr);
+    if(result === null){
+      calcDisplay.value = 'Ошибка';
+      calcExpr = '';
+      setTimeout(calcRender, 700);
+      return;
+    }
+    calcExpr = String(result);
+  } else if(val){
+    const last = calcExpr.slice(-1);
+    const ops = ['+','-','*','/'];
+
+    if(ops.includes(val) && ops.includes(last) && calcExpr !== ''){
+      if(!(val === '-' && (last === '*' || last === '/' || last === '('))){
+        calcExpr = calcExpr.slice(0, -1) + val;
+      } else {
+        calcExpr += val;
+      }
+    } else if(val === '.'){
+      const m = calcExpr.match(/[0-9.]*$/);
+      const cur = m ? m[0] : '';
+      if(cur.includes('.')) return;
+      if(cur === '') calcExpr += '0';
+      calcExpr += '.';
+    } else {
+      calcExpr += val;
+    }
+  }
+
+  calcRender();
+});
+
+calcRender();
+
+/* ============================================================
+   ПЕРЕЗАПУСК
+   ============================================================ */
+$('#restartBtn').addEventListener('click', () => {
+  state.name = '';
+  state.stage = 1;
+  state.index = 0;
+  state.correct1 = 0;
+  state.correct2 = 0;
+  state.answered = false;
+  state.current = null;
+  state.selection = null;
+  state._opts = null;
+  pickedChip = null;
+  dragChip = null;
+
+  calcExpr = '';
+  calcRender();
+  calcToggleShow(false);
+
+  nameInput.value = '';
+  startBtn.disabled = true;
+  $('#nameError').style.display = 'none';
+  $('#studentName').textContent = '';
+  $('#progressFill').style.width = '0%';
+
+  showScreen('start');
+  setTimeout(() => { try{ nameInput.focus(); }catch(_){} }, 80);
+});
+
+/* Стартовый фокус */
+setTimeout(() => { try{ nameInput.focus(); }catch(_){} }, 150);
+</script>
+</body>
+</html>
